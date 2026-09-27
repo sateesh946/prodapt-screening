@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -29,5 +30,31 @@ class DemoControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @ParameterizedTest
+    @CsvSource(
+            {"eloquent, loquen",
+            "country, ountr",
+            "person, erso",
+            "ab, ''",
+            "xyz, y",
+            "_123_%qwerty+, 123_%qwerty"}
+    )
+    public void shouldReturnResponseOk(String input, String output) throws Exception {
+        mockMvc.perform(get("/demo/api/v1/remove").param("input", input))
+                .andExpect(status().isOk())
+                .andExpect(content().string(output));
+    }
+
+    @Test
+    public void shouldReturnBadResponse() throws Exception {
+        mockMvc.perform(get("/demo/api/v1/remove").param("input", "a"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void shouldReturnBadResponseForEmptyInput() throws Exception {
+        mockMvc.perform(get("/demo/api/v1/remove").param("input", ""))
+                .andExpect(status().isBadRequest());
+    }
     // add your test cases here
 }
